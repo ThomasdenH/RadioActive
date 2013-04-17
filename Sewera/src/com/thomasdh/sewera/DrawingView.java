@@ -1,10 +1,9 @@
 package com.thomasdh.sewera;
 
-import java.util.ArrayList;
-
 import com.thomasdh.sewera.entity.Player;
 
 import UI.Knop;
+import UI.TouchPad;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,7 +22,8 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 	private Player p;
 	private long lastTime;
 	private DisplayMetrics displaymetrics;
-	private ArrayList<Knop> k;
+	private Knop k;
+	private TouchPad touchpad;
 
 	private Paint antiAlias = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -77,23 +77,28 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 
 	void logic() {
 		if (p == null) {
-			p = new Player(getWidth() / 2 - dpToPixel(100), 
-					getHeight() / 2 - dpToPixel(25), 
-					0, 
-					dpToPixel(100), 
-					dpToPixel(25), 
-					dpToPixel(50), 
+			touchpad = new TouchPad(BitmapFactory.decodeResource(getResources(), R.drawable.movepad), new Rect(0, getHeight() - dpToPixel(70), dpToPixel(70), getHeight())) {
+				@Override
+				public void buttonPressed() {
+					p.setX(p.getX() + 2);
+				}
+			};
+			p = new Player(getWidth() / 2 - dpToPixel(100),
+					getHeight() / 2 - dpToPixel(25),
+					0,
+					dpToPixel(100),
+					dpToPixel(25),
+					dpToPixel(50),
 					BitmapFactory.decodeResource(getResources(), R.drawable.person));
-			k = new ArrayList<Knop>();
-			k.add(new Knop(BitmapFactory.decodeResource(getResources(), R.drawable.knop),
+			k = new Knop(BitmapFactory.decodeResource(getResources(), R.drawable.knop),
 					new Rect(getWidth() - dpToPixel(70), getHeight() - dpToPixel(70), getWidth(), getHeight())) {
 				@Override
 				public void buttonPressed() {
 					p.jump();
 				}
-			});
+			};
 		}
-
+		touchpad.actionIfPressed();
 		animation.update(System.currentTimeMillis() - lastTime);
 		p.update(System.currentTimeMillis() - lastTime);
 		lastTime = System.currentTimeMillis();
@@ -103,20 +108,39 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 		canvas.drawColor(Color.GREEN);
 		canvas.drawBitmap(animation.getImage(), animation.getSourceRect(), new Rect(0, 0, animation.sizeX * 2, animation.sizeY * 2), antiAlias);
 		canvas.drawBitmap(p.getImage(), p.getSourceRect(), p.getDestRect(), antiAlias);
-		for (Knop knop : k) {
-			canvas.drawBitmap(knop.getImage(), knop.getSourceRect(), knop.getDestRect(), antiAlias);
-		}
+		canvas.drawBitmap(k.getImage(), k.getSourceRect(), k.getDestRect(), antiAlias);
+		canvas.drawBitmap(touchpad.getImage(), touchpad.getSourceRect(), touchpad.getDestRect(), antiAlias);
 	}
+
+	int knopPointer, touchpadPointer;
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		for (Knop knop : k) {
-			if (event.getAction() == MotionEvent.ACTION_UP) {
-				knop.setPressed(false);
-			} else {
-				if (knop.checkForPress((int) event.getX(), (int) event.getY())) {
-				}
-			}
+		final int action = event.getAction();
+		int pointer;
+		switch (action & MotionEvent.ACTION_MASK) {
+		case MotionEvent.ACTION_DOWN:
+			if(!k.checkForPress((int) event.getX(), (int) event.getY(), false))
+			touchpad.checkForPress((int) event.getX(), (int) event.getY(), false);
+			break;
+		case MotionEvent.ACTION_POINTER_DOWN:
+			pointer = event.getPointerId(1);
+			if(!k.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), false))
+			touchpad.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), false);
+			break;
+		case MotionEvent.ACTION_UP:
+			if(!k.checkForPress((int) event.getX(), (int) event.getY(), true))
+			touchpad.checkForPress((int) event.getX(), (int) event.getY(), true);
+			break;
+		case MotionEvent.ACTION_CANCEL:
+			if(!k.checkForPress((int) event.getX(), (int) event.getY(), true))
+			touchpad.checkForPress((int) event.getX(), (int) event.getY(), true);
+			break;
+		case MotionEvent.ACTION_POINTER_UP:
+			pointer = event.getPointerId(1);
+			if(!k.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), true))
+			touchpad.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), true);
+			break;
 		}
 		return true;
 	}

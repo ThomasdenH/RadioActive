@@ -2,20 +2,27 @@ package UI;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.util.Log;
 
-public abstract class Knop {
+public abstract class TouchPad {
 	private Bitmap b;
 	private int width;
 	private int height;
-	private boolean pressed;
+	private int pressed;
 	private Rect destRect;
 
-	public Knop(Bitmap b, Rect destRect) {
+	public TouchPad(Bitmap b, Rect destRect) {
 		this.b = b;
-		this.pressed = false;
+		this.pressed = 0;
 		this.setWidth(b.getWidth() / 2);
 		this.setHeight(b.getHeight());
 		this.destRect = destRect;
+	}
+	
+	public void actionIfPressed() {
+		if(pressed != 0){
+			this.buttonPressed();
+		}
 	}
 
 	public Bitmap getImage() {
@@ -27,7 +34,7 @@ public abstract class Knop {
 	}
 
 	public Rect getSourceRect() {
-		if (pressed == true) {
+		if (pressed != 0) {
 			return new Rect(getWidth(), 0, 2 * getWidth(), getHeight());
 		}
 		return new Rect(0, 0, getWidth(), getHeight());
@@ -35,25 +42,28 @@ public abstract class Knop {
 
 	public boolean checkForPress(int x, int y, boolean end) {
 		Rect check = getDestRect();
-		if (check.contains(x, y)) {
-			if (end) {
-				setPressed(false);
-			} else {
-				setPressed(true);
+		if(check.contains(x, y)){
+			if(end){
+				setPressed(0);
+			}else{
+				setPressed(1);
+				
 			}
 			return true;
-		} else {
-			setPressed(false);
+		}else{
+			setPressed(0);
 			return false;
 		}
 	}
-
-	public void setPressed(boolean pressedd) {
-		if (pressedd) {
-			pressed = true;
+	
+	public void setPressed(int pressedd){
+		if(pressedd != 0){
+			pressed = pressedd;
 			buttonPressed();
-		} else {
-			pressed = false;
+			Log.w("PRessed", "YEs");
+		}else{
+			Log.w("Pressed", "no");
+			pressed = 0;
 		}
 	}
 
