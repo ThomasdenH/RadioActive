@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 
 public abstract class Entity {
-	int x, y, z, sizeX, sizeY, sizeZ;
+	float x, y, z, sizeX, sizeY, sizeZ;
 	Bitmap b;
 	private Rect sourceRect;
 	private Rect destRect;
@@ -17,7 +17,7 @@ public abstract class Entity {
 		this.sizeY = sizeY;
 		this.sizeZ = sizeZ;
 		sourceRect = new Rect(0, 0, b.getWidth(), b.getHeight());
-		destRect = new Rect(this.x, this.z + this.y - this.sizeZ, this.x + this.sizeX, this.y + this.z + this.sizeY);
+		destRect = new Rect((int) this.x, (int) this.z + (int) this.y - (int) this.sizeZ, (int) this.x + (int) this.sizeX, (int) this.y + (int) this.z + (int) this.sizeY);
 	}
 
 	public abstract Bitmap getImage();
@@ -38,54 +38,54 @@ public abstract class Entity {
 	public abstract void updateLocation(long deltaTime);
 
 	public void updateRects() {
-		destRect.set(x, z + y - sizeZ, x + sizeX, y + z + sizeY);
+		destRect.set((int) x, (int) z + (int) y - (int) sizeZ, (int) x + (int) sizeX, (int) y + (int) z + (int) sizeY);
 	}
 
-	public int getX() {
+	public float getX() {
 		return x;
 	}
 
-	public void setX(int x) {
+	public void setX(float x) {
 		this.x = x;
 	}
 
-	public int getY() {
+	public float getY() {
 		return y;
 	}
 
-	public void setY(int y) {
+	public void setY(float y) {
 		this.y = y;
 	}
 
-	public int getZ() {
+	public float getZ() {
 		return z;
 	}
 
-	public void setZ(int z) {
+	public void setZ(float z) {
 		this.z = z;
 	}
 
-	public int getSizeX() {
+	public float getSizeX() {
 		return sizeX;
 	}
 
-	public void setSizeX(int sizeX) {
+	public void setSizeX(float sizeX) {
 		this.sizeX = sizeX;
 	}
 
-	public int getSizeY() {
+	public float getSizeY() {
 		return sizeY;
 	}
 
-	public void setSizeY(int sizeY) {
+	public void setSizeY(float sizeY) {
 		this.sizeY = sizeY;
 	}
 
-	public int getSizeZ() {
+	public float getSizeZ() {
 		return sizeZ;
 	}
 
-	public void setSizeZ(int sizeZ) {
+	public void setSizeZ(float sizeZ) {
 		this.sizeZ = sizeZ;
 	}
 

@@ -1,7 +1,6 @@
 package com.thomasdh.sewera.entity;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.thomasdh.sewera.SpritesheetAnimationMultipleLayers;
 
@@ -17,7 +16,6 @@ public class Player extends MovingEntity {
 
 	@Override
 	public void updateLocation(long deltaTime) {
-		Log.w("Jump Amount", "" + jumpAmount);
 		if (jumping) {
 			z += jumpAmount;
 			jumpAmount++;

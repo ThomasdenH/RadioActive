@@ -2,7 +2,7 @@ package UI;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.util.Log;
+
 
 public abstract class TouchPad {
 	private Bitmap b;
@@ -10,6 +10,7 @@ public abstract class TouchPad {
 	private int height;
 	private int pressed;
 	private Rect destRect;
+	private int xTouchLocation, yTouchLocation;
 
 	public TouchPad(Bitmap b, Rect destRect) {
 		this.b = b;
@@ -18,9 +19,9 @@ public abstract class TouchPad {
 		this.setHeight(b.getHeight());
 		this.destRect = destRect;
 	}
-	
+
 	public void actionIfPressed() {
-		if(pressed != 0){
+		if (pressed != 0) {
 			this.buttonPressed();
 		}
 	}
@@ -40,29 +41,28 @@ public abstract class TouchPad {
 		return new Rect(0, 0, getWidth(), getHeight());
 	}
 
-	public boolean checkForPress(int x, int y, boolean end) {
+	public boolean checkForPress(int xTouch, int yTouch, boolean end) {
 		Rect check = getDestRect();
-		if(check.contains(x, y)){
-			if(end){
+		if (check.contains(xTouch, yTouch)) {
+			setxTouchLocation(xTouch - getX() - getWidth() / 2);
+			setyTouchLocation(yTouch - getY() - getHeight() / 2);
+			if (end) {
 				setPressed(0);
-			}else{
+			} else {
 				setPressed(1);
-				
 			}
 			return true;
-		}else{
+		} else {
 			setPressed(0);
 			return false;
 		}
 	}
-	
-	public void setPressed(int pressedd){
-		if(pressedd != 0){
+
+	public void setPressed(int pressedd) {
+		if (pressedd != 0) {
 			pressed = pressedd;
 			buttonPressed();
-			Log.w("PRessed", "YEs");
-		}else{
-			Log.w("Pressed", "no");
+		} else {
 			pressed = 0;
 		}
 	}
@@ -83,5 +83,37 @@ public abstract class TouchPad {
 
 	public void setWidth(int width) {
 		this.width = width;
+	}
+
+	public int getY() {
+		return destRect.top;
+	}
+
+	public void setY(int y) {
+		this.destRect.top = y;
+	}
+
+	public int getX() {
+		return this.destRect.left;
+	}
+
+	public void setX(int x) {
+		this.destRect.left = x;
+	}
+
+	public int getxTouchLocation() {
+		return xTouchLocation;
+	}
+
+	public void setxTouchLocation(int xTouchLocation) {
+		this.xTouchLocation = xTouchLocation;
+	}
+
+	public int getyTouchLocation() {
+		return yTouchLocation;
+	}
+
+	public void setyTouchLocation(int yTouchLocation) {
+		this.yTouchLocation = yTouchLocation;
 	}
 }

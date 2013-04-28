@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -77,10 +78,14 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 
 	void logic() {
 		if (p == null) {
-			touchpad = new TouchPad(BitmapFactory.decodeResource(getResources(), R.drawable.movepad), new Rect(0, getHeight() - dpToPixel(70), dpToPixel(70), getHeight())) {
+			touchpad = new TouchPad(BitmapFactory.decodeResource(getResources(), R.drawable.movepad), new Rect(0, getHeight() - dpToPixel(140), dpToPixel(140), getHeight())) {
 				@Override
 				public void buttonPressed() {
-					p.setX(p.getX() + 2);
+					double atan = Math.atan2(this.getyTouchLocation(), this.getxTouchLocation());
+					p.setX((float) (p.getX() + 2 * Math.cos(atan)));
+					p.setY((float) (p.getY() + 2 * Math.sin(atan)));
+					Log.w("touchPad pressed",
+							"x is " + this.getxTouchLocation() + ", y is " + this.getyTouchLocation() + ", atan is " + atan + ", the added y value is " + Math.sin(atan));
 				}
 			};
 			p = new Player(getWidth() / 2 - dpToPixel(100),
@@ -105,7 +110,7 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	void doDraw(Canvas canvas) {
-		canvas.drawColor(Color.GREEN);
+		canvas.drawColor(Color.BLUE);
 		canvas.drawBitmap(animation.getImage(), animation.getSourceRect(), new Rect(0, 0, animation.sizeX * 2, animation.sizeY * 2), antiAlias);
 		canvas.drawBitmap(p.getImage(), p.getSourceRect(), p.getDestRect(), antiAlias);
 		canvas.drawBitmap(k.getImage(), k.getSourceRect(), k.getDestRect(), antiAlias);
@@ -120,26 +125,30 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 		int pointer;
 		switch (action & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
-			if(!k.checkForPress((int) event.getX(), (int) event.getY(), false))
-			touchpad.checkForPress((int) event.getX(), (int) event.getY(), false);
+			if (!k.checkForPress((int) event.getX(), (int) event.getY(), false))
+				touchpad.checkForPress((int) event.getX(), (int) event.getY(), false);
+			break;
+		case MotionEvent.ACTION_MOVE:
+			if (!k.checkForPress((int) event.getX(), (int) event.getY(), false))
+				touchpad.checkForPress((int) event.getX(), (int) event.getY(), false);
 			break;
 		case MotionEvent.ACTION_POINTER_DOWN:
 			pointer = event.getPointerId(1);
-			if(!k.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), false))
-			touchpad.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), false);
+			if (!k.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), false))
+				touchpad.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), false);
 			break;
 		case MotionEvent.ACTION_UP:
-			if(!k.checkForPress((int) event.getX(), (int) event.getY(), true))
-			touchpad.checkForPress((int) event.getX(), (int) event.getY(), true);
+			if (!k.checkForPress((int) event.getX(), (int) event.getY(), true))
+				touchpad.checkForPress((int) event.getX(), (int) event.getY(), true);
 			break;
 		case MotionEvent.ACTION_CANCEL:
-			if(!k.checkForPress((int) event.getX(), (int) event.getY(), true))
-			touchpad.checkForPress((int) event.getX(), (int) event.getY(), true);
+			if (!k.checkForPress((int) event.getX(), (int) event.getY(), true))
+				touchpad.checkForPress((int) event.getX(), (int) event.getY(), true);
 			break;
 		case MotionEvent.ACTION_POINTER_UP:
 			pointer = event.getPointerId(1);
-			if(!k.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), true))
-			touchpad.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), true);
+			if (!k.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), true))
+				touchpad.checkForPress((int) event.getX(pointer), (int) event.getY(pointer), true);
 			break;
 		}
 		return true;
