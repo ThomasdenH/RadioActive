@@ -2,8 +2,6 @@ package com.thomasdh.sewera.game;
 
 import java.util.ArrayList;
 
-import android.graphics.Bitmap;
-
 public class Level {
 
 	private ArrayList<Room> rooms;
@@ -12,6 +10,10 @@ public class Level {
 	
 	public Level(Images imgs){
 		setRooms(new ArrayList<Room>());
+		getRooms().add(new Room(imgs));
+	}
+	
+	public void addRoom(){
 		getRooms().add(new Room(imgs));
 	}
 
