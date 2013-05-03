@@ -8,6 +8,8 @@ public class DrawingThread extends Thread {
 	private SurfaceHolder surfaceHolder;
 	private DrawingView dv;
 	private boolean run;
+	private final float fps = 50f;
+	private final float tickTime = 1000 / fps;
 
 	public DrawingThread(SurfaceHolder surfaceHolder, DrawingView dv) {
 		this.surfaceHolder = surfaceHolder;
@@ -38,16 +40,16 @@ public class DrawingThread extends Thread {
 				}
 			}
 			// //SLEEP
-			long sleepTime = System.currentTimeMillis() - beginTime;
-			if (sleepTime > 10) {
+			long elapsedTime = System.currentTimeMillis() - beginTime;
+			if (elapsedTime > tickTime) {
 				try {
-					Thread.sleep(sleepTime);
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			} else {
 				try {
-					Thread.sleep(10);
+					Thread.sleep((long) (tickTime - elapsedTime));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

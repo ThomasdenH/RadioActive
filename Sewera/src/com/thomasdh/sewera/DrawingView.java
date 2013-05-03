@@ -1,6 +1,9 @@
 package com.thomasdh.sewera;
 
 import com.thomasdh.sewera.entity.Player;
+import com.thomasdh.sewera.game.Images;
+import com.thomasdh.sewera.game.Level;
+import com.thomasdh.sewera.game.Room;
 
 import UI.Knop;
 import UI.TouchPad;
@@ -25,6 +28,8 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 	private DisplayMetrics displaymetrics;
 	private Knop k;
 	private TouchPad touchpad;
+	private Images imgs;
+	private Level l;
 
 	private Paint antiAlias = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -37,6 +42,9 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 		getHolder().addCallback(this);
 		animation = new SpritesheetAnimation(BitmapFactory.decodeResource(getResources(), R.drawable.wiel), 4, 100);
 		lastTime = System.currentTimeMillis();
+
+		imgs = new Images(this);
+		l = new Level(imgs);
 	}
 
 	@Override
@@ -109,10 +117,26 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 		lastTime = System.currentTimeMillis();
 	}
 
+	Rect screen = new Rect(0, 0, 0 + getWidth(), 0 + getHeight());
+
 	void doDraw(Canvas canvas) {
+		int translateX = (int) p.getX() - getWidth() / 2;
+		int translateY = (int) p.getY() - getHeight() / 2;
+		canvas.translate(-translateX, -translateY);
 		canvas.drawColor(Color.BLUE);
+
+		screen.set(translateX, translateY, translateX + getWidth(), translateY + getHeight());
+		Room cRoom = l.getCurrentRoom();
+		for (int x = 0; x < cRoom.level.size(); x++) {
+			if (Rect.intersects(cRoom.level.get(x).getDestRect(), screen)) {
+				canvas.drawBitmap(cRoom.level.get(x).getImage(), cRoom.level.get(x).getX(), cRoom.level.get(x).getY(), antiAlias);
+			}
+		}
+
 		canvas.drawBitmap(animation.getImage(), animation.getSourceRect(), new Rect(0, 0, animation.sizeX * 2, animation.sizeY * 2), antiAlias);
 		canvas.drawBitmap(p.getImage(), p.getSourceRect(), p.getDestRect(), antiAlias);
+
+		canvas.translate(translateX, translateY);
 		canvas.drawBitmap(k.getImage(), k.getSourceRect(), k.getDestRect(), antiAlias);
 		canvas.drawBitmap(touchpad.getImage(), touchpad.getSourceRect(), touchpad.getDestRect(), antiAlias);
 	}
